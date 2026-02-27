@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <style>
+        body {
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        .container {
+            background-color: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        h1 {
+            font-size: 1.2rem;
+            color: #888;
+            margin-bottom: 25px;
+            font-weight: normal;
+        }
+        .timer-wrapper {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .unit-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .cards-row {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+        .card {
+            background-color: #222;
+            color: white;
+            width: 45px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 6px;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .label {
+            color: #888;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>2029年1月25日まであと</h1>
+    <div class="timer-wrapper" id="timer">
+        <div class="unit-group">
+            <div class="cards-row">
+                <div class="card" id="d1">0</div><div class="card" id="d2">0</div>
+            </div>
+            <div class="label">日</div>
+        </div>
+        <div class="unit-group">
+            <div class="cards-row">
+                <div class="card" id="h1">0</div><div class="card" id="h2">0</div>
+            </div>
+            <div class="label">時間</div>
+        </div>
+        <div class="unit-group">
+            <div class="cards-row">
+                <div class="card" id="m1">0</div><div class="card" id="m2">0</div>
+            </div>
+            <div class="label">分</div>
+        </div>
+        <div class="unit-group">
+            <div class="cards-row">
+                <div class="card" id="s1">0</div><div class="card" id="s2">0</div>
+            </div>
+            <div class="label">秒</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const targetDate = new Date("2029-01-25T00:00:00").getTime();
+
+    function updateTimer() {
+        const now = new Date().getTime();
+        const diff = targetDate - now;
+
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        // 桁ごとに分解して表示 (例: 15 -> '1', '5')
+        const setDigit = (id1, id2, num) => {
+            const str = String(num).padStart(2, '0');
+            document.getElementById(id1).innerText = str[0];
+            document.getElementById(id2).innerText = str[1];
+        };
+
+        setDigit('d1', 'd2', d);
+        setDigit('h1', 'h2', h);
+        setDigit('m1', 'm2', m);
+        setDigit('s1', 's2', s);
+    }
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+</script>
+
+</body>
+</html>
