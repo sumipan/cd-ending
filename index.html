@@ -3,150 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown Timer</title>
+    <title>時を愛でるカウントダウン</title>
     <style>
         body {
-            background-color: #333;
+            background-color: #f7f3ef; /* 和紙のような淡い色 */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-        }
-        .container {
-            background-color: white;
-            padding: 40px 30px;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            width: 90%;
-            max-width: 600px;
-        }
-        h1 {
-            font-size: 1.2rem;
-            color: #888;
-            margin-bottom: 25px;
-            font-weight: normal;
-        }
-        .timer-wrapper {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap; /* 画面が小さい時は折り返す */
-        }
-        .unit-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .cards-row {
-            display: flex;
-            gap: 3px;
-            margin-bottom: 8px;
-        }
-        .card {
-            background-color: #222;
-            color: white;
-            width: 40px;
-            height: 55px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 6px;
-            font-size: 1.8rem;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-        .label {
-            color: #888;
-            font-size: 0.75rem;
+            font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+            color: #3e3a39; /* 墨色 */
         }
 
-        /* スマホ向けの調整 */
-        @media (max-width: 480px) {
-            .container { padding: 20px 10px; }
-            .timer-wrapper { gap: 10px; }
-            .card { width: 32px; height: 45px; font-size: 1.4rem; }
-            .cards-row { gap: 2px; }
-            h1 { font-size: 1rem; }
+        .container {
+            text-align: center;
+            padding: 40px;
+            max-width: 600px;
+            border: 1px solid #dcd1c6;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .header {
+            font-size: 0.9rem;
+            letter-spacing: 0.3em;
+            color: #8c8884;
+            margin-bottom: 20px;
+        }
+
+        .season-box {
+            margin-bottom: 40px;
+        }
+
+        .season-name {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #594d40;
+        }
+
+        .season-desc {
+            font-size: 1.1rem;
+            color: #7d7266;
+            line-height: 1.8;
+            border-bottom: 1px solid #dcd1c6;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .countdown {
+            font-size: 1rem;
+            color: #a39a92;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>2029年1月25日まであと</h1>
-    <div class="timer-wrapper" id="timer">
-        <div class="unit-group">
-            <div class="cards-row">
-                <div class="card" id="d1">0</div>
-                <div class="card" id="d2">0</div>
-                <div class="card" id="d3">0</div>
-                <div class="card" id="d4">0</div>
-            </div>
-            <div class="label">日</div>
-        </div>
-        <div class="unit-group">
-            <div class="cards-row">
-                <div class="card" id="h1">0</div><div class="card" id="h2">0</div>
-            </div>
-            <div class="label">時間</div>
-        </div>
-        <div class="unit-group">
-            <div class="cards-row">
-                <div class="card" id="m1">0</div><div class="card" id="m2">0</div>
-            </div>
-            <div class="label">分</div>
-        </div>
-        <div class="unit-group">
-            <div class="cards-row">
-                <div class="card" id="s1">0</div><div class="card" id="s2">0</div>
-            </div>
-            <div class="label">秒</div>
-        </div>
+    <div class="header" id="current-date">--月--日</div>
+    <div class="season-box">
+        <div class="season-name" id="season-name">--</div>
+        <div class="season-desc" id="season-desc">--</div>
     </div>
+    <div class="countdown" id="countdown-text">2029年1月25日まで、あと -- 日</div>
 </div>
 
 <script>
-    const targetDate = new Date("2029-01-25T00:00:00").getTime();
+    // 七十二候データ（簡略版）
+    const solarTerms = [
+        { start: [1, 20], name: "大寒", sub: ["款冬華", "水沢腹堅", "鶏始乳"] },
+        { start: [2, 4], name: "立春", sub: ["東風解凍", "黄鸝睍睆", "魚上氷"] },
+        { start: [2, 19], name: "雨水", sub: ["土脉潤起", "霞始靆", "草木萌動"] },
+        { start: [3, 6], name: "啓蟄", sub: ["蟄虫啓戸", "桃始笑", "菜虫化蝶"] },
+        { start: [3, 21], name: "春分", sub: ["雀始巣", "桜始開", "雷乃発声"] },
+        { start: [4, 5], name: "清明", sub: ["玄鳥至", "鴻雁北", "虹始見"] },
+        { start: [4, 20], name: "穀雨", sub: ["葭始生", "霜止出苗", "牡丹華"] },
+        { start: [5, 5], name: "立夏", sub: ["蛙始鳴", "蚯蚓出", "竹笋生"] },
+        { start: [5, 21], name: "小満", sub: ["蚕起食桑", "紅花栄", "麦秋至"] },
+        { start: [6, 6], name: "芒種", sub: ["螳螂生", "腐草為蛍", "梅子黄"] },
+        { start: [6, 21], name: "夏至", sub: ["乃東枯", "菖蒲華", "半夏生"] },
+        { start: [7, 7], name: "小暑", sub: ["温風至", "蓮始開", "鷹乃学習"] },
+        { start: [7, 23], name: "大暑", sub: ["桐始結花", "土潤溽暑", "大雨時行"] },
+        { start: [8, 8], name: "立秋", sub: ["涼風至", "寒蝉鳴", "蒙霧升降"] },
+        { start: [8, 23], name: "処暑", sub: ["綿柎開", "天地始粛", "禾乃登"] },
+        { start: [9, 8], name: "白露", sub: ["草露白", "鶺鴒鳴", "玄鳥去"] },
+        { start: [9, 23], name: "秋分", sub: ["雷乃収声", "蟄虫坏戸", "水始涸"] },
+        { start: [10, 8], name: "寒露", sub: ["鴻雁来", "菊花開", "蟋蟀在戸"] },
+        { start: [10, 24], name: "霜降", sub: ["霜始降", "霎時施", "楓蔦黄"] },
+        { start: [11, 7], name: "立冬", sub: ["山茶始開", "地始凍", "金盞香"] },
+        { start: [11, 22], name: "小雪", sub: ["虹蔵不見", "朔風払葉", "橘始黄"] },
+        { start: [12, 7], name: "大雪", sub: ["閉塞成冬", "熊蟄穴", "鱖魚群"] },
+        { start: [12, 22], name: "冬至", sub: ["乃東生", "麋角解", "雪下出麦"] }
+    ];
 
-    function updateTimer() {
-        const now = new Date().getTime();
-        const diff = targetDate - now;
+    function updateView() {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
+        
+        // 日付表示
+        document.getElementById("current-date").innerText = `${month}月${day}日`;
 
-        if (diff <= 0) {
-            document.getElementById("timer").innerHTML = "<h2>終了しました</h2>";
-            return;
+        // 季節判定
+        let currentTerm = solarTerms[0];
+        for (let i = 0; i < solarTerms.length; i++) {
+            const [m, d] = solarTerms[i].start;
+            if (month > m || (month === m && day >= d)) {
+                currentTerm = solarTerms[i];
+            }
         }
 
-        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        // 七十二候のどれか（簡易的に5日ごとに切り替え）
+        const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+        const subIndex = Math.min(Math.floor((dayOfYear % 15) / 5), 2);
+        
+        document.getElementById("season-name").innerText = currentTerm.sub[subIndex];
+        document.getElementById("season-desc").innerText = `今は「${currentTerm.name}」の季節。${currentTerm.sub[subIndex]} と言われる頃です。`;
 
-        const dStr = String(d).padStart(4, '0');
-        document.getElementById("d1").innerText = dStr[0];
-        document.getElementById("d2").innerText = dStr[1];
-        document.getElementById("d3").innerText = dStr[2];
-        document.getElementById("d4").innerText = dStr[3];
-
-        const hStr = String(h).padStart(2, '0');
-        document.getElementById("h1").innerText = hStr[0];
-        document.getElementById("h2").innerText = hStr[1];
-
-        const mStr = String(m).padStart(2, '0');
-        document.getElementById("m1").innerText = mStr[0];
-        document.getElementById("m2").innerText = mStr[1];
-
-        const sStr = String(s).padStart(2, '0');
-        document.getElementById("s1").innerText = sStr[0];
-        document.getElementById("s2").innerText = sStr[1];
+        // カウントダウン
+        const target = new Date("2029-01-25");
+        const diff = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
+        document.getElementById("countdown-text").innerText = `2029年1月25日まで、あと ${diff} 日`;
     }
 
-    setInterval(updateTimer, 1000);
-    updateTimer();
+    updateView();
 </script>
-
 </body>
 </html>
